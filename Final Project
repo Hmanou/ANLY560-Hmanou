@@ -1,0 +1,46 @@
+library(shiny)
+library(shinythemes)
+library(dplyr)
+library(readr)
+library(tidyverse)
+library(ggplot2)
+
+hotels = read.csv("C:/Users/HManou/Desktop/Project/hotel_bookings.csv")
+
+ui <- fluidPage(
+  titlePanel(
+    h2("Reservation Deposits and Cancellations", align = "center")
+    ),
+  
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("DepositType","Deposit Type :", choices = list("No Deposit", "Non Refund", "Refundable"), selected = "No Deposit")
+    ),
+  
+    mainPanel(
+      column(12,plotOutput(outputId="distPlot", width="500px",height="500px"))
+    )
+  )
+)
+
+server <- function(input, output) {
+  
+  output$distPlot <- 
+    renderPlot({
+      DepositType = input$deposit_type
+      print(DepositType)
+      if (DepositType== "No Deposit")
+        DepositType="No Deposit"
+      else if (DepositType== "Non Refund")
+        DepositType="Non Refund"
+      else if (DepositType== "Refundable")
+        DepositType="Refundable"
+      df = hotels[hotels$deposit_type==DepositType,]
+      
+      x= hotels$deposit_type
+      c <- ggplot(hotels, aes(deposit_type)) +
+        theme(axis.text.x  = element_text(angle = 45,vjust = 1))
+    })
+  
+}
+shinyApp(ui = ui, server = server)
